@@ -13,25 +13,6 @@ class PathLexer {
     return 'hello';
   }
   
-  public function lexer(string | array $value) {
-    $batch = [];
-    
-    if (is_string($value)) {
-      $batch[] = $this->generateTokens($value);
-    }
-    
-    foreach ($value as $path) {
-      if (! is_string($path)) {
-        throw new Exception('value passed into lexer must be of type string.'); 
-      }
-      
-      $instance = new PathLexer();
-      $batch[] = $instance->generateTokens($path);
-    }
-    
-    return $batch;
-  }
-  
   public function generateTokens(string $value) {
     $length = strlen($value);
     
