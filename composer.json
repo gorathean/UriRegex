@@ -1,0 +1,21 @@
+{
+    "name": "gorath/uri-regex",
+    "description": "a simple uri matching library that compiles to regular expression",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Gorath\\UriRegex\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Praise Anthony",
+            "email": "wisterion9@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require-dev": {
+        "phpunit/phpunit": "^11.1@dev"
+    }
+}
