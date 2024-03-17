@@ -2,15 +2,21 @@
 declare(strict_types=1);
 
 namespace Gorath\UriRegex;
+
 use Gorath\UriRegex\PathLexer;
+use Exception;
 
 class PathComposer {
   private PathLexer $lexer;
   private array $tokens = [];
-  private int $length = 0;
-  private int $idx = 0;
+  private int $length   = 0;
+  private int $idx      = 0;
   
-  public function __construct(PathLexer | string $lexer) {
+  public function __construct
+  (
+    PathLexer | string $lexer, 
+    protected array $config
+  ) {
     $this->lexer = gettype($lexer) == 'string' 
       ? new $lexer() 
       : $lexer;
@@ -19,11 +25,17 @@ class PathComposer {
   public function parse(string | array $path) {
     $this->tokens = $this->lexer->generateTokens($path);
     $this->length = count($this->tokens);
+    
+    //configs
+    $default_pattern = $this->config['default_pattern'] ?? '[^#/?]';
+    $allow_wildcards = $this->config['allow_wildcards'] ?? true;
+    $allow_spaces    = $this->config['allow_spaces'] ?? true;
+    
     $parse_list = [];
     
     while ($this->idx < $this->length) {
-      $char = $this->should_take('prefix');
-      $open = $this->should_take('open');
+      $char    = $this->should_take('char');
+      $open    = $this->should_take('open');
       $pattern = $this->should_take('pattern');
       
       if ($open || $pattern) {
@@ -33,22 +45,27 @@ class PathComposer {
           $prefix = '';
         }
         
-        $var = [
-          'name' => $open ? $this->must_take('string') : 0,
+        $variables = [
           'prefix' => $prefix,
+          'name' => $open ? $this->must_take('string') : 0,
           'pattern' => $this->should_take('pattern') ?? $pattern ?? $default_pattern,
-          'optional' => $pattern ? $this->should_take('pattern') : ''
         ];
+        
+        if ($allow_wildcards)
+          $variables['optional'] = $pattern ? $this->should_take('optional') : '';
         
         if ($open) {
           $this->must_take('close');
-          $var['optional'] = $this->should_take('optional') ?? '';
+          if ($allow_wildcards) 
+            $variables['optional'] = $this->should_take('optional') ?? '';
         }
         
+        array_push($parse_list, $variables);
         continue;
       }
       
-      break;
+      $this->idx ++;
+      //break;
     }
     
     return $parse_list;

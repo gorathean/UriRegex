@@ -111,7 +111,7 @@ class PathLexer {
     $token = new stdClass();
     $token->name = $name;
     $token->value = $value;
-    $token->index =  $idx;
+    $token->idx =  $idx;
     array_push($this->tokens, $token);
   }
   

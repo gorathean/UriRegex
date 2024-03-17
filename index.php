@@ -6,7 +6,15 @@ use Gorath\UriRegex\PathComposer;
 
 require './vendor/autoload.php';
 
-$path = '/path/~/{which(\w+)}?/';
-$list = (new PathComposer(PathLexer::class))->parse($path);
+$config = [
+  'default_pattern' => '[a-z_]',
+  'allow_wildcards' => false,
+  'strict'          => true,
+  'allow_spaces'    => true
+];
+
+$path = '/path/~/{ which }?/(\d*)?';
+$list = (new PathComposer(PathLexer::class, $config))
+  ->parse($path);
 
 print_r($list);
