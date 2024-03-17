@@ -69,11 +69,6 @@ class PathLexer {
         continue;
       }
       
-      if ($current_char == '/') {
-        $this->pushToken('prefix', $current_char, $this->current_idx ++);
-        continue;
-      }
-      
       if ($current_char == '?') {
         $this->pushToken('optional', $current_char, $this->current_idx ++);
         continue;
@@ -104,7 +99,7 @@ class PathLexer {
         continue;
       }
       
-      $this->pushToken('symb', $current_char, $this->current_idx ++);
+      $this->pushToken('char', $current_char, $this->current_idx ++);
     }
     
     $this->pushToken('end', '', $this->current_idx);
@@ -114,7 +109,7 @@ class PathLexer {
   private function pushToken(string $name, string $value, int $idx) {
     $this->pushString();
     $token = new stdClass();
-    $token->$name = $name;
+    $token->name = $name;
     $token->value = $value;
     $token->index =  $idx;
     array_push($this->tokens, $token);

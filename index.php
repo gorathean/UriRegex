@@ -1,13 +1,12 @@
 <?php
 declare(strict_types=1);
+
 use Gorath\UriRegex\PathLexer;
+use Gorath\UriRegex\PathComposer;
 
 require './vendor/autoload.php';
 
 $path = '/path/~/{which(\w+)}?/';
-$lexer = (new PathLexer)->lexer([
-  $path,
-  //'/vendor/{lib}'
-]);
+$list = (new PathComposer(PathLexer::class))->parse($path);
 
-print_r($lexer);
+print_r($list);
