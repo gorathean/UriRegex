@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
-namespace Gorath\UriRegex;
+namespace Gorathean\UriRegex;
 
-use Gorath\UriRegex\PathComposer;
+use Gorathean\UriRegex\PathComposer;
 
 class PathRegex {
   public function __construct(

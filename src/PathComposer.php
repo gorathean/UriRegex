@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Gorath\UriRegex;
+namespace Gorathean\UriRegex;
 
-use Gorath\UriRegex\PathLexer;
+use Gorathean\UriRegex\PathLexer;
 use Exception;
 
 class PathComposer {

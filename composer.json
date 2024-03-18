@@ -1,11 +1,11 @@
 {
-    "name": "gorath/uri-regex",
-    "description": "a simple uri matching library that compiles to regular expression",
+    "name": "gorathean/uri-regex",
+    "description": "a simple library of matching uri segments",
     "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Gorath\\UriRegex\\": "src/"
+            "Gorathean\\UriRegex\\": "src/"
         }
     },
     "authors": [
@@ -15,7 +15,5 @@
         }
     ],
     "minimum-stability": "dev",
-    "require-dev": {
-        "phpunit/phpunit": "^11.1@dev"
-    }
+    "require": {}
 }

@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-use Gorath\UriRegex\PathLexer;
-use Gorath\UriRegex\PathComposer;
-use Gorath\UriRegex\PathRegex;
+use Gorathean\UriRegex\PathLexer;
+use Gorathean\UriRegex\PathComposer;
+use Gorathean\UriRegex\PathRegex;
 
 require './vendor/autoload.php';
 
