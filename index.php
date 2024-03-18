@@ -3,18 +3,34 @@ declare(strict_types=1);
 
 use Gorath\UriRegex\PathLexer;
 use Gorath\UriRegex\PathComposer;
+use Gorath\UriRegex\PathRegex;
 
 require './vendor/autoload.php';
 
-$config = [
-  'default_pattern' => '[a-z_]',
-  'allow_wildcards' => false,
-  'strict'          => true,
-  'allow_spaces'    => true
-];
+class UriRegex {
+  private PathRegex $regex;
+  
+  public function __construct
+  (
+    readonly string $pattern, 
+    array $config = []
+  ) {
+    $this->regex = new PathRegex(new PathComposer(PathLexer::class, $config));
+  }
+  
+  public function match(string $uri) {
+    $exp = $this->regex->toRegex($this->pattern);
+    $reg = preg_match($exp, $uri, $match);
+    
+    return [
+      'match'  => $reg,
+      'params' => array_filter($match ?? [], fn($value) => is_string($value), ARRAY_FILTER_USE_KEY),
+      'path'   => $uri
+    ];
+  }
+  
+  public function getRegex() {
+    return $this->regex->toRegex($this->pattern);
+  }
+}
 
-$path = '/path/~/{ which }?/(\d*)?';
-$list = (new PathComposer(PathLexer::class, $config))
-  ->parse($path);
-
-print_r($list);

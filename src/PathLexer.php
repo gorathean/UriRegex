@@ -75,14 +75,9 @@ class PathLexer {
       }
       
       if ($current_char == '*') {
-        $this->pushToken('once', $current_char, $this->current_idx ++);
+        $this->pushToken('wild', $current_char, $this->current_idx ++);
         continue;
       }
-      
-      if ($current_char == '~') {
-          $this->pushToken('more', $current_char, $this->current_idx ++);
-          continue;
-        }
       
       if (ord($current_char) == 32) {
         $this->pushToken('space', $current_char, $this->current_idx ++);

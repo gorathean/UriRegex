@@ -7,67 +7,84 @@ use Gorath\UriRegex\PathLexer;
 use Exception;
 
 class PathComposer {
-  private PathLexer $lexer;
+  private PathLexer $lexer_instance;
   private array $tokens = [];
   private int $length   = 0;
   private int $idx      = 0;
   
   public function __construct
   (
-    PathLexer | string $lexer, 
-    protected array $config
+    private PathLexer | string $lexer,
+    public array $config
   ) {
-    $this->lexer = gettype($lexer) == 'string' 
+    $this->lexer_instance = gettype($lexer) == 'string' 
       ? new $lexer() 
       : $lexer;
   }
   
-  public function parse(string | array $path) {
-    $this->tokens = $this->lexer->generateTokens($path);
+  public function parse(string $path) {
+    $instance = new PathComposer($this->lexer, $this->config);
+    return $instance->compose($path);
+  }
+  
+  private function compose(string $path) {
+    $this->tokens = $this->lexer_instance->generateTokens($path);
     $this->length = count($this->tokens);
     
     //configs
-    $default_pattern = $this->config['default_pattern'] ?? '[^#/?]';
-    $allow_wildcards = $this->config['allow_wildcards'] ?? true;
-    $allow_spaces    = $this->config['allow_spaces'] ?? true;
+    $default_pattern = $this->config['default_pattern'] ?? '[^#?\\/]';
     
     $parse_list = [];
     
     while ($this->idx < $this->length) {
-      $char    = $this->should_take('char');
-      $open    = $this->should_take('open');
-      $pattern = $this->should_take('pattern');
+      $char     = $this->should_take('char');
+      $open     = $this->should_take('open');
+      $pattern  = $this->should_take('pattern');
       
       if ($open || $pattern) {
         $prefix = $char ?? '';
-        if ($prefix != '/') {
-          array_push($parse_list, '/');
+        if ($prefix && $prefix != '/') {
+          array_push($parse_list, $prefix);
           $prefix = '';
         }
         
         $variables = [
-          'prefix' => $prefix,
-          'name' => $open ? $this->must_take('string') : 0,
-          'pattern' => $this->should_take('pattern') ?? $pattern ?? $default_pattern,
+          'prefix'   => $prefix,
+          'name'     => $open ? $this->must_take('string') : 0,
+          'pattern'  => $this->should_take('pattern') ?? $pattern ?? $default_pattern,
+          'optional' => $pattern ? $this->should_take('optional') : ''
         ];
-        
-        if ($allow_wildcards)
-          $variables['optional'] = $pattern ? $this->should_take('optional') : '';
         
         if ($open) {
           $this->must_take('close');
-          if ($allow_wildcards) 
-            $variables['optional'] = $this->should_take('optional') ?? '';
+          $variables['optional'] = $this->should_take('optional') ?? '';
         }
         
         array_push($parse_list, $variables);
         continue;
       }
       
-      $this->idx ++;
-      //break;
+      $paths = $char ?? $this->should_take('string')
+      ?? $this->should_take('space')
+      ?? $this->should_take('esc');
+      
+      if ($paths) {
+        array_push($parse_list, $paths);
+        continue;
+      }
+      
+      if ($this->should_take('wild')) {
+        array_push($parse_list, [ 
+          'name'     => 'wild', 
+          'pattern'  => '(?:[^#?\\/]*)',
+        ]);
+        continue;
+      }
+      
+      break;
     }
     
+    $this->must_take('end');
     return $parse_list;
   }
   
